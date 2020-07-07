@@ -9,7 +9,7 @@ import sys
 
 def scrape_catalog(url, id):
   try:
-    with open('AZ/{} catalog.txt'.format(id), 'r', encoding = 'utf-8') as file:
+    with open('data/{} catalog.txt'.format(id), 'r', encoding = 'utf-8') as file:
       print ("Loaded from file")
       return file.read()
   except FileNotFoundError:
@@ -20,7 +20,7 @@ def scrape_catalog(url, id):
       print (url)
       print ("Bad HTTP code {}".format(r.status_code))
       return "Add something here"
-    with open('AZ/{} catalog.txt'.format(id), 'w', encoding = 'utf-8') as file:
+    with open('data/{} catalog.txt'.format(id), 'w', encoding = 'utf-8') as file:
       file.write(r.text)
     return r.text
   except Exception as e:
@@ -29,7 +29,7 @@ def scrape_catalog(url, id):
   
 def soup_catalog_page(text, id):
     try:
-        with open('AZ/data/{} data.txt'.format(id), 'r', encoding = 'utf-8') as file:
+        with open('data/{} data.txt'.format(id), 'r', encoding = 'utf-8') as file:
             text = file.read()
             return
     except FileNotFoundError:
@@ -38,8 +38,7 @@ def soup_catalog_page(text, id):
         dt = [x.get_text().replace(':', '') for x in soup.find_all('dt')]
         dd = [x.get_text().replace('\n', '') for x in soup.find_all('dd')]
         dataDict = dict(zip(dt,dd))
-        with open('AZ/data/{} data.txt'.format(id), 'w', encoding = 'utf-8') as file:
-            print (json.dumps(dataDict))
+        with open('data/{} data.txt'.format(id), 'w', encoding = 'utf-8') as file:
             file.write(json.dumps(dataDict))
         return
     except Exception as e:
@@ -48,7 +47,7 @@ def soup_catalog_page(text, id):
 
 def scrape_image(url, id):
   try:
-    i = Image.open("AZ/{}.jpg".format(id))
+    i = Image.open("data/images/{}.jpg".format(id))
     print ("Loaded from file")
     return
   except FileNotFoundError:
@@ -60,7 +59,7 @@ def scrape_image(url, id):
       print ("Bad HTTP code {}".format(r.status_code))
       return "Add something here"
     i = Image.open(r.raw)
-    i.save("AZ/{}.jpg".format(id))
+    i.save("data/images/{}.jpg".format(id))
   except Exception as e:
     print (e)
     sys.exit()
