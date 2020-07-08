@@ -26,6 +26,7 @@ def soup_catalog_page(text, id):
 
 
 def scrape_catalog(url, id):
+  
     try:
         with open('data/{} data.txt'.format(id), 'r', encoding = 'utf-8') as file:
             text = file.read()
@@ -79,18 +80,20 @@ def scrape_image(url, id):
         print(e)
         sys.exit()
 
-# Set up URLS
-page_urls = [(f"https://usdawatercolors.nal.usda.gov/pom/catalog.xhtml"
-       f"?id=POM0000{idx:04}") for idx in range(1, 7585)]
-image_urls = [(f"https://usdawatercolors.nal.usda.gov/pom/download.xhtml"
-        f"?id=POM0000{idx:04}") for idx in range(1, 7585)]
+if __name__ == "__main__":
 
-for url in page_urls:
-    id = url.split('=')[1]
-    print (url)
-    scrape_catalog(url, id)
+    # Set up URLS
+    page_urls = [(f"https://usdawatercolors.nal.usda.gov/pom/catalog.xhtml"
+          f"?id=POM0000{idx:04}") for idx in range(1, 7585)]
+    image_urls = [(f"https://usdawatercolors.nal.usda.gov/pom/download.xhtml"
+            f"?id=POM0000{idx:04}") for idx in range(1, 7585)]
 
-for url in image_urls:
-    id = url.split('=')[1]
-    print (url)
-    scrape_image(url, id)
+    for url in page_urls:
+        id = url.split('=')[1]
+        print (url)
+        scrape_catalog(url, id)
+
+    for url in image_urls:
+        id = url.split('=')[1]
+        print (url)
+        scrape_image(url, id)
