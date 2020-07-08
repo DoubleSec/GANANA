@@ -26,7 +26,7 @@ def soup_catalog_page(text, id):
 
 
 def scrape_catalog(url, id):
-  
+
     try:
         with open('data/{} data.txt'.format(id), 'r', encoding = 'utf-8') as file:
             text = file.read()
@@ -72,7 +72,8 @@ def scrape_image(url, id):
             return "Add something here"
 
         i = Image.open(r.raw)
-        i.thumbnail(720)
+        # Happens in place
+        i.thumbnail((720, 720))
         i.save("data/images/{}.jpg".format(id))
 
     except Exception as e:
