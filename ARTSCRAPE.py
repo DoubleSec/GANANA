@@ -7,6 +7,7 @@ import pandas
 import time
 import json
 import sys
+import os
 
 def create_folders():
 
@@ -14,7 +15,7 @@ def create_folders():
         if not os.path.isdir(each):
             logger.info(f"'{each}' folder does not exist. "
                                 f"Making '{each}' folder.")
-            os.mkdir('logs')
+            os.mkdir(each)
             logger.info(f"'{each}' folder created.")
     return
 
@@ -52,18 +53,15 @@ def scrape_catalog(url, id):
 
     except FileNotFoundError:
 
-        print ("scraping")
-        #logger.info(f"Scraping {url}")
+        logger.info(f"Scraping {url}")
 
         r = requests.get(url)
         time.sleep(2+random.randrange(1,10)*.1)
 
         if r.status_code != 200:
 
-            print (url)
-            print ("Bad HTTP code {}".format(r.status_code))
-            #logger.info(f"Scrape failed for {url}"
-            #            f"HTTP code {r.status_code}")
+            logger.info(f"Scrape failed for {url}"
+                        f"HTTP code {r.status_code}")
 
             return "Add something here"
 
@@ -72,8 +70,7 @@ def scrape_catalog(url, id):
 
     except Exception as e:
 
-        print(e)
-        #logger.exception(f"{e} for {url}")
+        logger.exception(f"{e} for {url}")
         sys.exit()
 
 def scrape_image(url, id):
@@ -81,41 +78,42 @@ def scrape_image(url, id):
     imageFileName = f'data/images/{id}.jpg'
     try:
         i = Image.open(imageFileName)
-        print ("Loaded from file")
-        #logger.info(f"Loaded image {id} from file")
+        logger.info(f"Loaded image {id} from file")
         return
 
     except FileNotFoundError:
 
-        r = requests.get(url, stream=True)
-        r.raw.decode_content=True
-        time.sleep(2+random.randrange(1,10)*.1)
+        try :
+            r = requests.get(url, stream=True)
+            r.raw.decode_content=True
+            time.sleep(2+random.randrange(1,10)*.1)
 
-        if r.status_code != 200:
+            if r.status_code != 200:
 
-            print (url)
-            print ("Bad HTTP code {}".format(r.status_code))
-            #logger.info(f"Scrape failed for {url}"
-            #            f"HTTP code {r.status_code}")
+                logger.info(f"Scrape failed for {url}"
+                            f"HTTP code {r.status_code}")
 
-            return "Add something here"
+                return "Add something here"
 
-        i = Image.open(r.raw)
-        # Happens in place
-        i.thumbnail((720, 720))
-        i.save(imageFileName)
-        #logger.info(f"Image {id} saved")
+            i = Image.open(r.raw)
+            # Happens in place
+            i.thumbnail((720, 720))
+            i.save(imageFileName)
+            logger.info(f"Image {id} saved")
+
+        # If for whatever reason we fail to get a file, just skip.
+        except Exception as e:
+
+            logger.exception(f"{e} for {url}, skipping...")
 
     except Exception as e:
 
-        print(e)
-        #logger.exception(f"{e} for {url}")
+        logger.exception(f"{e} for {url}")
         sys.exit()
 
 if __name__ == "__main__":
     
-    #create_folders()
-    #setup_Logfile()
+    setup_Logfile()
     
     # Set up URLS
     page_urls = [(f"https://usdawatercolors.nal.usda.gov/pom/catalog.xhtml"
@@ -125,12 +123,10 @@ if __name__ == "__main__":
 
     for url in page_urls:
         id = url.split('=')[1]
-        print (url)
-        #logger.info(f"Next data page to try: {url}")
+        logger.info(f"Next data page to try: {url}")
         scrape_catalog(url, id)
 
     for url in image_urls:
         id = url.split('=')[1]
-        print (url)
-        #logger.info(f"Next image page to try: {url}")
+        logger.info(f"Next image page to try: {url}")
         scrape_image(url, id)
